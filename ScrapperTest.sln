@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26430.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScrapperTest", "ScrapperTest\ScrapperTest.csproj", "{07712292-1560-46A7-8082-8C3C86ABCFFB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BovespaBot", "BovespaBot\BovespaBot.csproj", "{62972138-71CC-4768-A63F-40F6ADC9C0A6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{07712292-1560-46A7-8082-8C3C86ABCFFB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{07712292-1560-46A7-8082-8C3C86ABCFFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{07712292-1560-46A7-8082-8C3C86ABCFFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{07712292-1560-46A7-8082-8C3C86ABCFFB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{62972138-71CC-4768-A63F-40F6ADC9C0A6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{62972138-71CC-4768-A63F-40F6ADC9C0A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{62972138-71CC-4768-A63F-40F6ADC9C0A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{62972138-71CC-4768-A63F-40F6ADC9C0A6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

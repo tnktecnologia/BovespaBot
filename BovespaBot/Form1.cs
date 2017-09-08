@@ -14,6 +14,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web.UI.WebControls;
 using System.Windows.Forms;
+using static System.Windows.Forms.CheckedListBox;
 
 namespace BovespaBot
 {
@@ -23,18 +24,17 @@ namespace BovespaBot
         {
             InitializeComponent();
 
-            try
-            {
-                listaEmpresa = ImportFromExcel(); //Carregar listaEmpresa com dados do ultimo Excel gerado
-            }
-            catch
-            {
-                listaEmpresa = Bovespa.RetornaListaDeEmpresas();
-            }
-            chkListEmpresas.Items.AddRange(listaEmpresa.ToArray());
+            CarregarListaDeEmpresas();
         }
 
         private List<Empresa> listaEmpresa { get; set; }
+
+        private List<Empresa> empresasChecked {
+            get
+            {
+                return  chkListEmpresas.CheckedItems.Cast<Empresa>().ToList();
+            }
+        }
 
         private string path = System.Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + $"\\BovespaBot";
 
@@ -42,28 +42,24 @@ namespace BovespaBot
         {
             try
             {
-                var timeStart = DateTime.Now;
-                var timeDadosBasicos = DateTime.Now;
-                var timeDadosAcoes = DateTime.Now;
-                var listaEmpresa = new List<Empresa>();
                 var listaAcoes = new List<Acao>();
                 var listaTemp = new List<Empresa>();
                 var listaCodigos = new List<string>();
+                var empresasABuscar = empresasChecked;
                 if (chkDados.Checked)
                 {
-                    listaEmpresa = Bovespa.RetornaListaDeEmpresas();
-                    listaCodigos = listaEmpresa.Select(c => c.CodigoCVM).ToList();
+                    listaCodigos = empresasABuscar.Select(c => c.CodigoCVM).ToList();
                     while (listaCodigos.Count > 0)
                     {
-                        var listaErros = Bovespa.ConsultaEmpresas(listaCodigos,listaEmpresa, out listaTemp);
+                        var listaErros = Bovespa.ConsultaEmpresas(listaCodigos, empresasABuscar, out listaTemp);
                         listaCodigos = listaErros;
 
                         foreach(var emp in listaTemp)
                         {
                             try
                             {
-                                var i = listaEmpresa.IndexOf(listaEmpresa.First(c => c.CodigoCVM == emp.CodigoCVM));
-                                listaEmpresa[i] = emp;
+                                var i = empresasABuscar.IndexOf(empresasABuscar.First(c => c.CodigoCVM == emp.CodigoCVM));
+                                empresasABuscar[i] = emp;
                             }
                             catch
                             {
@@ -72,20 +68,13 @@ namespace BovespaBot
                         }
                     }
                 }
-                else
-                {
-                    listaEmpresa = ImportFromExcel(); //Carregar listaEmpresa com dados do ultimo Excel gerado
-                    listaCodigos = listaEmpresa.Select(c => c.CodigoCVM).ToList();
-                }
-                timeDadosBasicos = DateTime.Now;
 
                 //Consulta Valores de ações
                 if (chkValores.Checked)
                 {
-                    listaAcoes = VerificaAcoes(listaEmpresa, listaAcoes);
+                    listaAcoes = VerificaAcoes(empresasABuscar, listaAcoes);
 
                 }
-                timeDadosAcoes = DateTime.Now;
 
                 //Consulta Relatórios financeiros
                 
@@ -96,9 +85,8 @@ namespace BovespaBot
                         var listaErros = Bovespa.RetornaRelatorios(codigo, true);
                     }
                 }
-                var tempoGastoAcoes = timeDadosAcoes - timeDadosBasicos;
-                var tempoGastoDadosBasicos = timeDadosBasicos - timeStart;
-                ExportToExcel(listaEmpresa, listaAcoes);
+
+                ExportToExcel(empresasABuscar, listaAcoes);
             }
             catch (Exception ex)
             {
@@ -170,6 +158,8 @@ namespace BovespaBot
             var arquivo = (from f in directory.GetFiles().Where(c=> !c.Name.StartsWith("~"))
                            orderby f.LastWriteTime descending
                            select f).First();
+
+            lblAtualizada.Text = "Última Atualização em " + arquivo.LastWriteTime.ToShortDateString() + " às " + arquivo.LastWriteTime.ToShortTimeString();
             var listaEmpresa = new List<Empresa>();
 
             Microsoft.Office.Interop.Excel.Application xlApp = new Microsoft.Office.Interop.Excel.Application();
@@ -240,6 +230,32 @@ namespace BovespaBot
         {
             for (int ix = 0; ix < chkListEmpresas.Items.Count; ++ix)
                 chkListEmpresas.SetItemChecked(ix, chkSelecionarTodas.Checked);
+        }
+
+        private void CarregarListaDeEmpresas()
+        {
+            if(listaEmpresa != null && listaEmpresa.Count > 0)
+                chkListEmpresas.Items.AddRange(listaEmpresa.ToArray());
+            else
+            {
+                try
+                {
+                    listaEmpresa = ImportFromExcel(); //Carregar listaEmpresa com dados do ultimo Excel gerado
+                    chkListEmpresas.Items.AddRange(listaEmpresa.ToArray());
+                }
+                catch
+                {
+                    chkListEmpresas.Items.Add("Clique em Consultar Atualizar Lista de Empresas para obter a lista de empresas atualizada.");
+                }
+            }
+            
+        }
+
+        private void btnAtualizar_Click(object sender, EventArgs e)
+        {
+            listaEmpresa = Bovespa.RetornaListaDeEmpresas();
+            chkListEmpresas.Items.Clear();
+            CarregarListaDeEmpresas();
         }
     }
 }

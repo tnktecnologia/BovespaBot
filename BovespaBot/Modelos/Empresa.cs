@@ -37,6 +37,11 @@ namespace BovespaBot.Modelos
         public List<AcoesEmCirculacao> ListaAcoesEmCirculacao { get; set; }
 
         public CapitalSocial ComposicaoCapitalSocial { get; set; }
+
+        public override string ToString()
+        {
+            return Nome;
+        }
     }
 
     public class PosicaoAcionaria
@@ -67,4 +72,6 @@ namespace BovespaBot.Modelos
         
         public string Total { get; set; }
     }
+
+
 }

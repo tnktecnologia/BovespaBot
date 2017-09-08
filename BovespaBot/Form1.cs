@@ -22,6 +22,16 @@ namespace BovespaBot
         public Form1()
         {
             InitializeComponent();
+
+            try
+            {
+                listaEmpresa = ImportFromExcel(); //Carregar listaEmpresa com dados do ultimo Excel gerado
+            }
+            catch
+            {
+                listaEmpresa = Bovespa.RetornaListaDeEmpresas();
+            }
+            chkListEmpresas.Items.AddRange(listaEmpresa.ToArray());
         }
 
         private List<Empresa> listaEmpresa { get; set; }
@@ -38,7 +48,7 @@ namespace BovespaBot
                 var listaEmpresa = new List<Empresa>();
                 var listaAcoes = new List<Acao>();
                 var listaTemp = new List<Empresa>();
-                var listaCodigos = new List<string>(); 
+                var listaCodigos = new List<string>();
                 if (chkDados.Checked)
                 {
                     listaEmpresa = Bovespa.RetornaListaDeEmpresas();
@@ -83,7 +93,7 @@ namespace BovespaBot
                 {
                     foreach(var codigo in listaCodigos)
                     {
-                        var listaErros = Bovespa.RetornaRelatorios(codigo);
+                        var listaErros = Bovespa.RetornaRelatorios(codigo, true);
                     }
                 }
                 var tempoGastoAcoes = timeDadosAcoes - timeDadosBasicos;
@@ -210,5 +220,26 @@ namespace BovespaBot
         }
 
         #endregion
+
+        private void chkDados_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void chkValores_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void chkRelatorios_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void chkSelecionarTodas_CheckedChanged(object sender, EventArgs e)
+        {
+            for (int ix = 0; ix < chkListEmpresas.Items.Count; ++ix)
+                chkListEmpresas.SetItemChecked(ix, chkSelecionarTodas.Checked);
+        }
     }
 }

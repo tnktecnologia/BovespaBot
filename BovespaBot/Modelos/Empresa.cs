@@ -38,6 +38,8 @@ namespace BovespaBot.Modelos
 
         public CapitalSocial ComposicaoCapitalSocial { get; set; }
 
+        public List<Acao> ListaAcoes { get; set; }
+
         public override string ToString()
         {
             return Nome;

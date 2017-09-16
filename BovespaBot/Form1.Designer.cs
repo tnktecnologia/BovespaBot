@@ -29,7 +29,6 @@
         private void InitializeComponent()
         {
             this.chkDados = new System.Windows.Forms.CheckBox();
-            this.chkValores = new System.Windows.Forms.CheckBox();
             this.chkRelatorios = new System.Windows.Forms.CheckBox();
             this.btnBuscar = new System.Windows.Forms.Button();
             this.chkListEmpresas = new System.Windows.Forms.CheckedListBox();
@@ -54,25 +53,12 @@
             this.chkDados.UseVisualStyleBackColor = true;
             this.chkDados.CheckedChanged += new System.EventHandler(this.chkDados_CheckedChanged);
             // 
-            // chkValores
-            // 
-            this.chkValores.AutoSize = true;
-            this.chkValores.Checked = true;
-            this.chkValores.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkValores.Location = new System.Drawing.Point(339, 253);
-            this.chkValores.Name = "chkValores";
-            this.chkValores.Size = new System.Drawing.Size(109, 17);
-            this.chkValores.TabIndex = 1;
-            this.chkValores.Text = "Valores de Ações";
-            this.chkValores.UseVisualStyleBackColor = true;
-            this.chkValores.CheckedChanged += new System.EventHandler(this.chkValores_CheckedChanged);
-            // 
             // chkRelatorios
             // 
             this.chkRelatorios.AutoSize = true;
             this.chkRelatorios.Checked = true;
             this.chkRelatorios.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkRelatorios.Location = new System.Drawing.Point(339, 277);
+            this.chkRelatorios.Location = new System.Drawing.Point(339, 252);
             this.chkRelatorios.Name = "chkRelatorios";
             this.chkRelatorios.Size = new System.Drawing.Size(130, 17);
             this.chkRelatorios.TabIndex = 2;
@@ -189,7 +175,6 @@
             this.Controls.Add(this.chkListEmpresas);
             this.Controls.Add(this.btnBuscar);
             this.Controls.Add(this.chkRelatorios);
-            this.Controls.Add(this.chkValores);
             this.Controls.Add(this.chkDados);
             this.Name = "Form1";
             this.Text = "BovespaBot";
@@ -201,7 +186,6 @@
         #endregion
 
         private System.Windows.Forms.CheckBox chkDados;
-        private System.Windows.Forms.CheckBox chkValores;
         private System.Windows.Forms.CheckBox chkRelatorios;
         private System.Windows.Forms.Button btnBuscar;
         private System.Windows.Forms.CheckedListBox chkListEmpresas;

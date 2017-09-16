@@ -69,13 +69,6 @@ namespace BovespaBot
                     }
                 }
 
-                //Consulta Valores de ações
-                if (chkValores.Checked)
-                {
-                    listaAcoes = VerificaAcoes(empresasABuscar, listaAcoes);
-
-                }
-
                 //Consulta Relatórios financeiros
                 
                 if (chkRelatorios.Checked)
@@ -86,7 +79,7 @@ namespace BovespaBot
                     }
                 }
 
-                ExportToExcel(empresasABuscar, listaAcoes);
+                ExportToExcel(empresasABuscar);
             }
             catch (Exception ex)
             {
@@ -94,11 +87,13 @@ namespace BovespaBot
             }
         }
 
-        public void ExportToExcel(List<Empresa> listaEmpresa, List<Acao> listaAcoes)
+        public void ExportToExcel(List<Empresa> listaEmpresa)
         {
             if (!Directory.Exists(path))
                 Directory.CreateDirectory(path);
             path += $"\\RelatorioScraper__{DateTime.Now.Day}-{DateTime.Now.Month}-{DateTime.Now.Year}_{DateTime.Now.Hour}-{DateTime.Now.Minute}-{DateTime.Now.Second}";
+
+            
 
             var listaTabelas = new List<System.Data.DataTable>();
 
@@ -127,7 +122,7 @@ namespace BovespaBot
                     empresa.Site);
             }
             
-
+/*
             var acoesEmpresa = new System.Data.DataTable("Ações");
             
             acoesEmpresa.Columns.Add("Nome", typeof(string));
@@ -141,7 +136,7 @@ namespace BovespaBot
             }
 
             listaTabelas.Add(acoesEmpresa);
-
+            */
             listaTabelas.Add(dadosEmpresa);
 
 
@@ -155,7 +150,7 @@ namespace BovespaBot
                 throw new Exception("Caminho não encontrado");
 
             var directory = new DirectoryInfo(path);
-            var arquivo = (from f in directory.GetFiles().Where(c=> !c.Name.StartsWith("~"))
+            var arquivo = (from f in directory.GetFiles().Where(c=> c.Name == "Empresas.xlsx")
                            orderby f.LastWriteTime descending
                            select f).First();
 
@@ -251,10 +246,16 @@ namespace BovespaBot
             
         }
 
+        private void SalvarEmpresasAtualizadas()
+        {
+            ExportToExcel(listaEmpresa);
+        }
+
         private void btnAtualizar_Click(object sender, EventArgs e)
         {
             listaEmpresa = Bovespa.RetornaListaDeEmpresas();
             chkListEmpresas.Items.Clear();
+            //SalvarEmpresasAtualizadas();
             CarregarListaDeEmpresas();
         }
     }

@@ -192,6 +192,23 @@ namespace BovespaBot.Metodos
                         empresa.HtmlInformacoes = divDados.Text;
                     }
 
+                    //Ações
+                    var divAcoes = driver.FindElementByTagName("iframe");
+                    driver.SwitchTo().Frame(divAcoes);
+                    var trsAcoes = driver.FindElementByCssSelector("tbody").FindElements(By.CssSelector("tr"));
+                    empresa.ListaAcoes = new List<Acao>();
+                    foreach (var tr in trsAcoes)
+                    {
+                        
+                        empresa.ListaAcoes.Add(new Acao
+                        {
+                            CodigoDeNegociacao = tr.FindElement(By.ClassName("symbol-short-name-container")).Text,
+                            NomeEmpresa = empresa.Nome,
+                            Valor = tr.FindElement(By.ClassName("symbol-last")).Text,
+                            Variacao = tr.FindElement(By.ClassName("symbol-change")).Text +" / " + tr.FindElement(By.ClassName("symbol-change-pt")).Text
+                        });
+                    }
+
                     //Posição Acionária
                     if(driver.PageSource.Contains("Posição Acionária"))
                     {

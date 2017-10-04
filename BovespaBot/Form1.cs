@@ -87,11 +87,36 @@ namespace BovespaBot
             }
         }
 
+        public void ExportListaEmpresa(List<Empresa> listaEmpresa)
+        {
+            if (!Directory.Exists(path))
+                Directory.CreateDirectory(path);
+            
+            path += $"\\Empresas";
+
+            var listaTabelas = new List<System.Data.DataTable>();
+
+            var dadosEmpresa = new System.Data.DataTable("Dados de Empresas");
+
+            dadosEmpresa.Columns.Add("Nome", typeof(string));
+            dadosEmpresa.Columns.Add("Codigo CVM", typeof(string));
+
+            foreach (var empresa in listaEmpresa)
+            {
+                dadosEmpresa.Rows.Add(empresa.Nome,
+                    empresa.CodigoCVM);
+            }
+
+            listaTabelas.Add(dadosEmpresa);
+
+            listaTabelas.ExportToExcel(path);
+        }
+
         public void ExportToExcel(List<Empresa> listaEmpresa)
         {
             if (!Directory.Exists(path))
                 Directory.CreateDirectory(path);
-            path += $"\\RelatorioScraper__{DateTime.Now.Day}-{DateTime.Now.Month}-{DateTime.Now.Year}_{DateTime.Now.Hour}-{DateTime.Now.Minute}-{DateTime.Now.Second}";
+            var newPath = path +  $"\\RelatorioBovespa__{DateTime.Now.Day}-{DateTime.Now.Month}-{DateTime.Now.Year}_{DateTime.Now.Hour}-{DateTime.Now.Minute}-{DateTime.Now.Second}";
 
             
 
@@ -108,6 +133,16 @@ namespace BovespaBot
             dadosEmpresa.Columns.Add("Atividade Principal", typeof(string));
             dadosEmpresa.Columns.Add("Classificação  Setorial", typeof(string));
             dadosEmpresa.Columns.Add("Site", typeof(string));
+            dadosEmpresa.Columns.Add("Posição Acionária", typeof(string));
+            dadosEmpresa.Columns.Add("Ações em Circulação", typeof(string));
+            dadosEmpresa.Columns.Add("Composição do Capital Social", typeof(string));
+
+            var acoesEmpresa = new System.Data.DataTable("Ações");
+
+            acoesEmpresa.Columns.Add("Nome", typeof(string));
+            acoesEmpresa.Columns.Add("Código De Negociação", typeof(string));
+            acoesEmpresa.Columns.Add("Valor", typeof(string));
+            acoesEmpresa.Columns.Add("Variação", typeof(string));
 
             foreach (var empresa in listaEmpresa)
             {
@@ -119,29 +154,22 @@ namespace BovespaBot
                     empresa.CNPJ, 
                     empresa.AtividadePrincipal, 
                     empresa.ClassificacaoSetorial, 
-                    empresa.Site);
-            }
-            
-/*
-            var acoesEmpresa = new System.Data.DataTable("Ações");
-            
-            acoesEmpresa.Columns.Add("Nome", typeof(string));
-            acoesEmpresa.Columns.Add("Código De Negociação", typeof(string));
-            acoesEmpresa.Columns.Add("Valor", typeof(string));
-            acoesEmpresa.Columns.Add("Variação", typeof(string));
+                    empresa.Site,
+                    String.Join("||", empresa.ListaPosicaoAcionaria.Select(c=> "Nome: " + c.Nome + "-- %ON: " + c.ON + "-- %PN: " + c.PN + "-- %Total: " +c.Total)),
+                    String.Join("||", empresa.ListaAcoesEmCirculacao.Select(c => "Investidor: " + c.TipoDeInvestidores + "-- Quantidade: " + c.Quantidade + "-- Percentual: " + c.Percentual)),
+                    String.Join("||", "Ordinárias: " + empresa.ComposicaoCapitalSocial.Ordinarias + "-- Preferenciais: " + empresa.ComposicaoCapitalSocial.Preferenciais + "-- Total:" + empresa.ComposicaoCapitalSocial.Total));
 
-            foreach(var acao in listaAcoes)
-            {
-                acoesEmpresa.Rows.Add(acao.NomeEmpresa, acao.CodigoDeNegociacao, acao.Valor, acao.Variacao);
+                foreach(var acao in empresa.ListaAcoes)
+                {
+                    acoesEmpresa.Rows.Add(acao.NomeEmpresa, acao.CodigoDeNegociacao, acao.Valor, acao.Variacao);
+                }
             }
+
 
             listaTabelas.Add(acoesEmpresa);
-            */
             listaTabelas.Add(dadosEmpresa);
 
-
-
-            listaTabelas.ExportToExcel(path);
+            listaTabelas.ExportToExcel(newPath);
         }
 
         public List<Empresa> ImportFromExcel()
@@ -158,7 +186,8 @@ namespace BovespaBot
             var listaEmpresa = new List<Empresa>();
 
             Microsoft.Office.Interop.Excel.Application xlApp = new Microsoft.Office.Interop.Excel.Application();
-            Microsoft.Office.Interop.Excel.Workbook xlWorkbook = xlApp.Workbooks.Open(arquivo.FullName);
+            xlApp.DisplayAlerts = false;
+            Microsoft.Office.Interop.Excel.Workbook xlWorkbook = xlApp.Workbooks.Open(arquivo.FullName, ReadOnly: true);
             Microsoft.Office.Interop.Excel._Worksheet xlWorksheet = xlWorkbook.Sheets[1];
             Microsoft.Office.Interop.Excel.Range xlRange = xlWorksheet.UsedRange;
             try
@@ -168,9 +197,7 @@ namespace BovespaBot
                     var empresa = new Empresa();
 
                     empresa.Nome = xlRange.Cells[i, 1].Value2.ToString();
-                    empresa.CodigoCVM = xlRange.Cells[i, 5].Value2.ToString();
-                    string codigosNeg = xlRange.Cells[i, 3]?.Value2?.ToString() ?? "";
-                    empresa.CodigosNegociacao = string.IsNullOrEmpty(codigosNeg) ? new List<string>() : codigosNeg.Split(',').ToList();
+                    empresa.CodigoCVM = xlRange.Cells[i, 2].Value2.ToString();
                     listaEmpresa.Add(empresa);
                 }
             }
@@ -248,15 +275,16 @@ namespace BovespaBot
 
         private void SalvarEmpresasAtualizadas()
         {
-            ExportToExcel(listaEmpresa);
+            ExportListaEmpresa(listaEmpresa);
         }
 
         private void btnAtualizar_Click(object sender, EventArgs e)
         {
             listaEmpresa = Bovespa.RetornaListaDeEmpresas();
             chkListEmpresas.Items.Clear();
-            //SalvarEmpresasAtualizadas();
+            SalvarEmpresasAtualizadas();
             CarregarListaDeEmpresas();
+            lblAtualizada.Text = "Última Atualização em " + DateTime.Today.ToShortDateString() + " às " + DateTime.Today.ToShortTimeString();
         }
     }
 }

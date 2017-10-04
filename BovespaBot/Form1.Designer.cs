@@ -56,14 +56,13 @@
             // chkRelatorios
             // 
             this.chkRelatorios.AutoSize = true;
-            this.chkRelatorios.Checked = true;
-            this.chkRelatorios.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkRelatorios.Location = new System.Drawing.Point(339, 252);
             this.chkRelatorios.Name = "chkRelatorios";
             this.chkRelatorios.Size = new System.Drawing.Size(130, 17);
             this.chkRelatorios.TabIndex = 2;
             this.chkRelatorios.Text = "Relatórios Financeiros";
             this.chkRelatorios.UseVisualStyleBackColor = true;
+            this.chkRelatorios.Visible = false;
             this.chkRelatorios.CheckedChanged += new System.EventHandler(this.chkRelatorios_CheckedChanged);
             // 
             // btnBuscar
@@ -151,6 +150,7 @@
             this.ddlPeriodo.Name = "ddlPeriodo";
             this.ddlPeriodo.Size = new System.Drawing.Size(121, 21);
             this.ddlPeriodo.TabIndex = 9;
+            this.ddlPeriodo.Visible = false;
             // 
             // label2
             // 
@@ -160,6 +160,7 @@
             this.label2.Size = new System.Drawing.Size(50, 13);
             this.label2.TabIndex = 10;
             this.label2.Text = "Trimestre";
+            this.label2.Visible = false;
             // 
             // Form1
             // 

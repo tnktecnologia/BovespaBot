@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Office.Interop.Excel;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -11,10 +12,11 @@ namespace BovespaBot.Extensions
 {
     public static class DataTableExt
     {
-        public static void ExportToExcel(this List<DataTable> tblList, string excelFilePath = null)
+        public static void ExportToExcel(this List<System.Data.DataTable> tblList, string excelFilePath = null)
         {
             // load excel, and create a new workbook
             var excelApp = new Microsoft.Office.Interop.Excel.Application();
+            excelApp.DisplayAlerts = false;
             var wb = excelApp.Workbooks.Add();
 
             try
@@ -56,7 +58,7 @@ namespace BovespaBot.Extensions
                 {
                     try
                     {
-                        wb.SaveAs(excelFilePath);
+                        wb.SaveAs(excelFilePath, Microsoft.Office.Interop.Excel.XlFileFormat.xlWorkbookDefault, Type.Missing, Type.Missing, true, false, XlSaveAsAccessMode.xlNoChange, XlSaveConflictResolution.xlLocalSessionChanges, Type.Missing, Type.Missing);
                         excelApp.Quit();
                         MessageBox.Show($"Arquivo Excel Salvo em {excelFilePath}!");
                     }
@@ -65,25 +67,7 @@ namespace BovespaBot.Extensions
                         throw new Exception("ExportToExcel: Excel file could not be saved! Check filepath.\n"
                                             + ex.Message);
                     }
-                    finally
-                    {
 
-                        if (wb.Sheets != null)
-                        {
-                            Marshal.FinalReleaseComObject(wb.Sheets);
-                        }
-                        
-                        if (wb != null)
-                        {
-                            Marshal.FinalReleaseComObject(wb);
-                            wb = null;
-                        }
-                        if (excelApp != null)
-                        {
-                            Marshal.FinalReleaseComObject(excelApp);
-                            excelApp = null;
-                        }
-                    }
                 }
                 else
                 { // no file path is given

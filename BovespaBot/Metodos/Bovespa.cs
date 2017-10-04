@@ -40,6 +40,7 @@ namespace BovespaBot.Metodos
                         if(empresa != null)
                         {
                             empresaAtualizada.Nome = empresa.Nome;
+                            empresaAtualizada.ListaAcoes.ForEach(c => c.NomeEmpresa = empresa.Nome);
                             empresa = empresaAtualizada;
                         }
                         listaDeEmpresas.Add(empresa);
@@ -194,10 +195,11 @@ namespace BovespaBot.Metodos
 
                     //Ações
                     var divAcoes = driver.FindElementByTagName("iframe");
+                    Thread.Sleep(TimeSpan.FromSeconds(2));
                     driver.SwitchTo().Frame(divAcoes);
                     var trsAcoes = driver.FindElementByCssSelector("tbody").FindElements(By.CssSelector("tr"));
                     empresa.ListaAcoes = new List<Acao>();
-                    foreach (var tr in trsAcoes)
+                    foreach (var tr in trsAcoes.Where(c=> !string.IsNullOrWhiteSpace(c.Text)))
                     {
                         
                         empresa.ListaAcoes.Add(new Acao
@@ -208,9 +210,9 @@ namespace BovespaBot.Metodos
                             Variacao = tr.FindElement(By.ClassName("symbol-change")).Text +" / " + tr.FindElement(By.ClassName("symbol-change-pt")).Text
                         });
                     }
-
+                    driver.SwitchTo().ParentFrame();
                     //Posição Acionária
-                    if(driver.PageSource.Contains("Posição Acionária"))
+                    if (driver.PageSource.Contains("Posição Acionária"))
                     {
                         var divPosicaoAcionaria = driver.FindElementById("divPosicaoAcionaria");
                         var trsPosicaoAcionaria = divPosicaoAcionaria.FindElement(By.CssSelector("tbody")).FindElements(By.CssSelector("tr"));
